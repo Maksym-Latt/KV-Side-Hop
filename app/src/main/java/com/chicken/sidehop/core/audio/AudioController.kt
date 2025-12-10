@@ -79,7 +79,6 @@ class MediaAudioController @Inject constructor(
     }
 
     override fun playTap() {
-        playEffect(R.raw.sfx_good_item)
     }
 
     override fun playSlide() {

@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.chicken.sidehop.ui.components.OutlinedText
 import com.chicken.sidehop.ui.components.PanelCard
 import com.chicken.sidehop.ui.theme.OutlineDark
@@ -40,8 +41,9 @@ fun IntroOverlay(onStart: () -> Unit, modifier: Modifier = Modifier) {
             ) {
                 OutlinedText(
                     text = "HOW TO PLAY",
-                    color = Color(0xFF5E3B1E),
+                    color = Color(0xffffffff),
                     outline = OutlineDark,
+                    fontSize = 50.sp
                 )
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -63,7 +65,7 @@ fun IntroOverlay(onStart: () -> Unit, modifier: Modifier = Modifier) {
                 )
                 OutlinedText(
                     text = "Tap anywhere to start!",
-                    color = Color(0xFF5E3B1E),
+                    color = Color(0xff93ec7b),
                     outline = OutlineDark,
                 )
             }
