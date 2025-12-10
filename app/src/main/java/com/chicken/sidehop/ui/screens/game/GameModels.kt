@@ -13,7 +13,7 @@ object LanePositions {
 }
 
 object CollisionConfig {
-    const val CONTACT_THRESHOLD = 0.8f
+    const val CONTACT_THRESHOLD = 0.7f
     const val GROUND_RANGE = 0.12f
     const val CATCH_WIDTH = 0.12f
     const val JUMP_INFLUENCE = 0.2f
