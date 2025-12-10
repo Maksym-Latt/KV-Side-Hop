@@ -5,7 +5,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
@@ -15,11 +14,10 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.chicken.sidehop.ui.screens.app.LoadingScreen
 import com.chicken.sidehop.ui.screens.app.MenuScreen
-import com.chicken.sidehop.ui.screens.app.ResultScreen
+import com.chicken.sidehop.ui.screens.game.ResultScreen
 import com.chicken.sidehop.ui.screens.app.SettingsScreen
 import com.chicken.sidehop.ui.screens.game.GameScreen
 import com.chicken.sidehop.ui.screens.game.GameViewModel
-import kotlinx.coroutines.delay
 
 sealed class AppRoute(val route: String) {
     data object Loading : AppRoute("loading")

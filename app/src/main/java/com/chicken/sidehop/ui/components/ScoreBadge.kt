@@ -22,8 +22,7 @@ fun ScoreBadge(score: Int, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
             .wrapContentWidth()
-            .height(48.dp)
-            .padding(horizontal = 12.dp),
+            .height(48.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {

@@ -10,11 +10,14 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
@@ -46,6 +49,7 @@ import com.chicken.sidehop.ui.components.ButtonStyle
 import com.chicken.sidehop.ui.components.OutlinedText
 import com.chicken.sidehop.ui.components.PanelCard
 import com.chicken.sidehop.ui.components.PrimaryButton
+import com.chicken.sidehop.ui.components.RoundButton
 import com.chicken.sidehop.ui.components.ScoreBadge
 import com.chicken.sidehop.ui.components.ToggleSwitch
 import com.chicken.sidehop.ui.screens.app.SettingsViewModel
@@ -59,7 +63,6 @@ fun GameScreen(
     onGameOver: (score: Int) -> Unit
 ) {
     val state by viewModel.uiState.collectAsState()
-    var showSettings by remember { mutableStateOf(false) }
 
     LaunchedEffect(state.isGameOver) {
         if (state.isGameOver) {
@@ -125,9 +128,10 @@ fun GameScreen(
 
             Row(
                 modifier = Modifier
-                    .padding(top = 24.dp, start = 24.dp, end = 24.dp)
-                    .align(Alignment.TopCenter)
-                    .fillMaxWidth(),
+                    .padding(WindowInsets.safeDrawing.asPaddingValues())
+                    .fillMaxWidth()
+                    .padding(start = 24.dp, end = 24.dp)
+                    .align(Alignment.TopCenter),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
@@ -160,14 +164,6 @@ fun GameScreen(
             PauseOverlay(
                 onResume = { viewModel.resumeGame() },
                 onMenu = onExit,
-                onSettings = { showSettings = true }
-            )
-        }
-
-        if (showSettings) {
-            SettingsOverlay(
-                onClose = { showSettings = false },
-                onMenu = onExit
             )
         }
 
@@ -192,149 +188,13 @@ fun GameScreen(
 private fun PauseButton(onClick: () -> Unit) {
     Box(
         modifier = Modifier
-            .size(64.dp)
-            .clip(CircleShape)
-            .background(Color.White.copy(alpha = 0.85f))
-            .clickable(onClick = onClick),
-        contentAlignment = Alignment.Center
+            .fillMaxWidth(),
+        contentAlignment = Alignment.CenterStart
     ) {
-        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            Box(
-                modifier = Modifier
-                    .height(28.dp)
-                    .width(8.dp)
-                    .clip(CircleShape)
-                    .background(OutlineDark)
-            )
-            Box(
-                modifier = Modifier
-                    .height(28.dp)
-                    .width(8.dp)
-                    .clip(CircleShape)
-                    .background(OutlineDark)
-            )
-        }
-    }
-}
-
-@Composable
-private fun PauseOverlay(
-    onResume: () -> Unit,
-    onMenu: () -> Unit,
-    onSettings: () -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.4f))
-    ) {
-        PanelCard(
-            modifier = Modifier
-                .align(Alignment.Center)
-                .padding(horizontal = 32.dp)
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                OutlinedText(
-                    text = "PAUSE",
-                    color = MaterialTheme.colorScheme.secondary,
-                    outline = OutlineDark,
-                )
-                PrimaryButton(text = "RESUME", onClick = onResume, style = ButtonStyle.Yellow)
-                PrimaryButton(text = "SETTINGS", onClick = onSettings, style = ButtonStyle.Yellow)
-                PrimaryButton(text = "MENU", onClick = onMenu, style = ButtonStyle.Red)
-            }
-        }
-    }
-}
-
-@Composable
-private fun IntroOverlay(onStart: () -> Unit, modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.4f))
-            .pointerInput(Unit) {
-                detectTapGestures { onStart() }
-            }
-    ) {
-        PanelCard(
-            modifier = Modifier
-                .align(Alignment.Center)
-                .padding(horizontal = 20.dp)
-        ) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                OutlinedText(
-                    text = "ЯК ГРАТИ",
-                    color = MaterialTheme.colorScheme.secondary,
-                    outline = OutlineDark,
-                )
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        OutlinedText(text = "Ліва половина", color = Color.White, outline = OutlineDark)
-                        OutlinedText(text = "Стрибок", color = Color.White, outline = OutlineDark)
-                    }
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        OutlinedText(text = "Права половина", color = Color.White, outline = OutlineDark)
-                        OutlinedText(text = "Ривок у бік", color = Color.White, outline = OutlineDark)
-                    }
-                }
-                OutlinedText(
-                    text = "Курка біжить між доріжками та ловить предмети навіть посередині.",
-                    color = Color.White,
-                    outline = OutlineDark,
-                )
-                OutlinedText(
-                    text = "Торкніться будь-де, щоб почати!",
-                    color = MaterialTheme.colorScheme.secondary,
-                    outline = OutlineDark,
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun SettingsOverlay(
-    onClose: () -> Unit,
-    onMenu: () -> Unit
-) {
-    val viewModel: SettingsViewModel = hiltViewModel()
-    val soundEnabled = viewModel.isSoundEnabled.collectAsState()
-    val musicEnabled = viewModel.isMusicEnabled.collectAsState()
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.55f))
-    ) {
-        PanelCard(
-            modifier = Modifier
-                .align(Alignment.Center)
-                .padding(horizontal = 24.dp)
-        ) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                OutlinedText(
-                    text = "SETTINGS",
-                    color = MaterialTheme.colorScheme.secondary,
-                    outline = OutlineDark,
-                )
-                ToggleSwitch(enabled = soundEnabled.value, onToggle = viewModel::onSoundToggle)
-                ToggleSwitch(enabled = musicEnabled.value, onToggle = viewModel::onMusicToggle)
-                PrimaryButton(text = "CLOSE", onClick = onClose, style = ButtonStyle.Yellow)
-                PrimaryButton(text = "MENU", onClick = onMenu, style = ButtonStyle.Red)
-            }
-        }
+        RoundButton(
+            icon = R.drawable.ic_settings,
+            size = 64.dp,
+            onClick = onClick
+        )
     }
 }

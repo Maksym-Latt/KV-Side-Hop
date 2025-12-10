@@ -1,4 +1,4 @@
-package com.chicken.sidehop.ui.screens.app
+package com.chicken.sidehop.ui.screens.game
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -7,15 +7,18 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.chicken.sidehop.R
 import com.chicken.sidehop.ui.components.ButtonStyle
 import com.chicken.sidehop.ui.components.OutlinedText
@@ -30,10 +33,11 @@ fun ResultScreen(
     onRetry: () -> Unit,
     onMenu: () -> Unit
 ) {
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(Color(0xFFE5F7FF))
     ) {
         Image(
             painter = painterResource(id = R.drawable.bg),
@@ -41,43 +45,62 @@ fun ResultScreen(
             modifier = Modifier.matchParentSize(),
             contentScale = ContentScale.Crop
         )
+
         Column(
             modifier = Modifier
-                .align(Alignment.Center)
+                .fillMaxSize()
                 .padding(horizontal = 32.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Spacer(modifier = Modifier.weight(0.6f))
+
             OutlinedText(
                 text = "WRONG PICK!",
-                color = MaterialTheme.colorScheme.secondary,
-                outline = OutlineDark,
+                color = Color(0xfff1b75e),
+                outline = Color(0xff4a2d11),
+                fontSize = 42.sp
             )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            OutlinedText(
+                text = "SCORE: $score",
+                color = Color(0xfffdfdfd),
+                outline = Color(0xffa17246),
+                fontSize = 30.sp
+            )
+
+            Spacer(modifier = Modifier.weight(0.4f))
+
             Image(
                 painter = painterResource(id = R.drawable.chicken_lose),
                 contentDescription = null,
-                modifier = Modifier.height(180.dp),
-                contentScale = ContentScale.Fit
+                modifier = Modifier
+                    .fillMaxWidth(0.62f),
+                contentScale = ContentScale.Crop
             )
-            PanelCard(modifier = Modifier.padding(horizontal = 12.dp)) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    OutlinedText(
-                        text = "SCORE: $score",
-                        color = YellowDeep,
-                        outline = OutlineDark,
-                    )
-                }
-            }
+
+            Spacer(modifier = Modifier.weight(0.7f))
+
             PrimaryButton(
                 text = "TRY AGAIN",
                 onClick = onRetry,
-                style = ButtonStyle.Yellow
+                style = ButtonStyle.Yellow,
+                height = 84.dp,
+                modifier = Modifier.fillMaxWidth()
             )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
             PrimaryButton(
                 text = "MENU",
                 onClick = onMenu,
-                style = ButtonStyle.Red
+                style = ButtonStyle.Red,
+                height = 84.dp,
+                modifier = Modifier.fillMaxWidth()
             )
+
+            Spacer(modifier = Modifier.weight(0.5f))
         }
     }
 }

@@ -45,7 +45,7 @@ fun PrimaryButton(
         ButtonStyle.Red -> R.drawable.btn_red
     }
     val textColor = when (style) {
-        ButtonStyle.Yellow -> YellowDeep
+        ButtonStyle.Yellow -> Color.White
         ButtonStyle.Red -> Color.White
     }
 
