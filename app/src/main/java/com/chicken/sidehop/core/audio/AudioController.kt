@@ -21,6 +21,7 @@ interface AudioController {
     val isMusicEnabled: StateFlow<Boolean>
     fun setSoundEnabled(enabled: Boolean)
     fun setMusicEnabled(enabled: Boolean)
+    fun playTap()
     fun playMenuMusic()
     fun playGameMusic()
     fun stopMusic()
@@ -29,6 +30,7 @@ interface AudioController {
     fun playLose()
     fun onAppForeground()
     fun onAppBackground()
+    fun persistSettings()
 }
 
 @Singleton
@@ -75,6 +77,10 @@ class MediaAudioController @Inject constructor(
         scope.launch { settingsRepository.updateMusic(enabled) }
     }
 
+    override fun playTap() {
+        playEffect(R.raw.sfx_good_item)
+    }
+
     override fun playMenuMusic() {
         if (!isMusicEnabled.value) return
         if (menuPlayer == null) {
@@ -118,6 +124,15 @@ class MediaAudioController @Inject constructor(
     override fun onAppBackground() {
         isInForeground = false
         currentMusic?.pause()
+    }
+
+    override fun persistSettings() {
+        scope.launch {
+            settingsRepository.persistAudioSettings(
+                soundEnabled = _isSoundEnabled.value,
+                musicEnabled = _isMusicEnabled.value
+            )
+        }
     }
 
     private fun switchMusic(target: MediaPlayer?) {

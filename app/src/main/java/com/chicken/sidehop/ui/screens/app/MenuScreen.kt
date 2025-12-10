@@ -122,7 +122,10 @@ fun MenuScreen(
                 RoundButton(
                     icon = R.drawable.ic_settings,
                     size = 64.dp,
-                    onClick = onSettings
+                    onClick = {
+                        viewModel.onButtonTap()
+                        onSettings()
+                    }
                 )
             }
 
@@ -141,7 +144,10 @@ fun MenuScreen(
             RoundButton(
                 icon = R.drawable.ic_play,
                 size = 140.dp,
-                onClick = onPlay
+                onClick = {
+                    viewModel.onButtonTap()
+                    onPlay()
+                }
             )
 
             Spacer(modifier = Modifier.weight(1f))
