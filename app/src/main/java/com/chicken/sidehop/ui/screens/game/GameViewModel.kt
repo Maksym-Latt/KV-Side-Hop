@@ -11,7 +11,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.abs
 import kotlin.math.max
+import kotlin.math.sign
 import kotlin.random.Random
 
 @HiltViewModel
@@ -44,16 +46,24 @@ class GameViewModel @Inject constructor(
 
     fun onJump() {
         _uiState.update { state ->
-            if (state.isPaused || state.isGameOver || state.isJumping) state
+            if (state.isPaused || state.isGameOver || state.isJumping || state.isIntroVisible) state
             else state.copy(isJumping = true, jumpVelocity = -2.3f)
         }
     }
 
     fun onSwitchLane() {
         _uiState.update { state ->
-            if (state.isPaused || state.isGameOver) state
-            else state.copy(chickenLane = if (state.chickenLane == Lane.LEFT) Lane.RIGHT else Lane.LEFT)
+            if (state.isPaused || state.isGameOver || state.isIntroVisible) state
+            else {
+                val newLane = if (state.chickenLane == Lane.LEFT) Lane.RIGHT else Lane.LEFT
+                val targetX = if (newLane == Lane.LEFT) LanePositions.LEFT else LanePositions.RIGHT
+                state.copy(chickenLane = newLane, chickenTargetX = targetX)
+            }
         }
+    }
+
+    fun dismissIntro() {
+        _uiState.update { it.copy(isIntroVisible = false) }
     }
 
     fun restart() {
@@ -77,7 +87,7 @@ class GameViewModel @Inject constructor(
 
     private fun tick(delta: Float) {
         val current = _uiState.value
-        if (current.isPaused || current.isGameOver) return
+        if (current.isPaused || current.isGameOver || current.isIntroVisible) return
 
         val difficulty = 1f + current.score * 0.05f
         spawnTimer -= delta
@@ -89,9 +99,11 @@ class GameViewModel @Inject constructor(
 
         val contactThreshold = 0.8f
         val groundRange = 0.12f
+        val catchWidth = 0.12f
 
         val collected = items.filter { item ->
-            item.lane == current.chickenLane && item.yProgress in contactThreshold..(contactThreshold + groundRange)
+            abs(item.xPosition - current.chickenX) <= catchWidth &&
+                item.yProgress in contactThreshold..(contactThreshold + groundRange)
         }
 
         if (collected.isNotEmpty()) {
@@ -121,18 +133,27 @@ class GameViewModel @Inject constructor(
             val doubleBonus = current.score >= 6 && Random.nextFloat() < 0.15f
             val newItems = mutableListOf<FallingItem>()
             if (Random.nextFloat() < comboChance) {
-                newItems += createItem(Lane.LEFT, ItemType.randomGood(), baseSpeed)
-                newItems += createItem(Lane.RIGHT, ItemType.randomBad(), baseSpeed + 0.12f)
+                newItems += createItem(ItemType.randomGood(), baseSpeed)
+                newItems += createItem(ItemType.randomBad(), baseSpeed + 0.12f)
             } else if (doubleBonus) {
-                newItems += createItem(Lane.LEFT, ItemType.EGG, baseSpeed)
-                newItems += createItem(Lane.RIGHT, ItemType.EGG, baseSpeed)
+                newItems += createItem(ItemType.EGG, baseSpeed)
+                newItems += createItem(ItemType.EGG, baseSpeed)
             } else {
-                val lane = if (Random.nextBoolean()) Lane.LEFT else Lane.RIGHT
                 val type = if (Random.nextFloat() > 0.3f) ItemType.randomGood() else ItemType.randomBad()
-                newItems += createItem(lane, type, baseSpeed)
+                newItems += createItem(type, baseSpeed)
             }
             items = items + newItems
             spawnTimer = max(0.6f, 1.2f / difficulty)
+        }
+
+        var chickenX = current.chickenX
+        val targetX = current.chickenTargetX
+        val runSpeed = 2.6f
+
+        if (abs(targetX - chickenX) > 0.001f) {
+            val direction = sign(targetX - chickenX)
+            val step = runSpeed * delta * direction
+            chickenX = if (abs(targetX - chickenX) <= abs(step)) targetX else chickenX + step
         }
 
         var jumpVelocity = current.jumpVelocity
@@ -152,6 +173,7 @@ class GameViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 items = items,
+                chickenX = chickenX,
                 chickenJumpOffset = jumpOffset,
                 jumpVelocity = jumpVelocity,
                 isJumping = isJumping
@@ -159,8 +181,15 @@ class GameViewModel @Inject constructor(
         }
     }
 
-    private fun createItem(lane: Lane, type: ItemType, baseSpeed: Float): FallingItem {
+    private fun createItem(type: ItemType, baseSpeed: Float): FallingItem {
+        val baseLane = when (Random.nextInt(3)) {
+            0 -> LanePositions.LEFT
+            1 -> LanePositions.CENTER
+            else -> LanePositions.RIGHT
+        }
+        val jitter = (Random.nextFloat() - 0.5f) * 0.08f
+        val spawnX = (baseLane + jitter).coerceIn(0.1f, 0.9f)
         val speed = baseSpeed + Random.nextFloat() * 0.5f
-        return FallingItem(lane = lane, type = type, speed = speed)
+        return FallingItem(xPosition = spawnX, type = type, speed = speed)
     }
 }
