@@ -22,6 +22,7 @@ interface AudioController {
     fun setSoundEnabled(enabled: Boolean)
     fun setMusicEnabled(enabled: Boolean)
     fun playTap()
+    fun playSlide()
     fun playMenuMusic()
     fun playGameMusic()
     fun stopMusic()
@@ -79,6 +80,10 @@ class MediaAudioController @Inject constructor(
 
     override fun playTap() {
         playEffect(R.raw.sfx_good_item)
+    }
+
+    override fun playSlide() {
+        playEffect(R.raw.sfx_slide)
     }
 
     override fun playMenuMusic() {

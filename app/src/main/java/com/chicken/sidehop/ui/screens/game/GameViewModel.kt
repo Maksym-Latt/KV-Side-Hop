@@ -61,7 +61,7 @@ class GameViewModel @Inject constructor(
         _uiState.update { state ->
             if (state.isPaused || state.isGameOver || state.isJumping || state.isIntroVisible) state
             else {
-                audioController.playTap()
+                audioController.playSlide()
                 state.copy(isJumping = true, jumpVelocity = -2.3f)
             }
         }
@@ -71,7 +71,7 @@ class GameViewModel @Inject constructor(
         _uiState.update { state ->
             if (state.isPaused || state.isGameOver || state.isIntroVisible) state
             else {
-                audioController.playTap()
+                audioController.playSlide()
                 val newLane = if (state.chickenLane == Lane.LEFT) Lane.RIGHT else Lane.LEFT
                 val targetX = if (newLane == Lane.LEFT) LanePositions.LEFT else LanePositions.RIGHT
                 state.copy(chickenLane = newLane, chickenTargetX = targetX)

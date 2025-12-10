@@ -36,6 +36,7 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.activity.compose.BackHandler
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.chicken.sidehop.R
@@ -143,20 +144,6 @@ fun GameScreen(
                 )
             }
 
-            Row(
-                modifier = Modifier
-                    .padding(WindowInsets.safeDrawing.asPaddingValues())
-                    .fillMaxWidth()
-                    .padding(start = 24.dp, end = 24.dp)
-                    .align(Alignment.TopCenter),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                PauseButton(onClick = { viewModel.togglePause() })
-                Spacer(modifier = Modifier.weight(1f))
-                ScoreBadge(score = state.score)
-            }
-
             Box(
                 modifier = Modifier
                     .matchParentSize()
@@ -171,6 +158,20 @@ fun GameScreen(
                         }
                     }
             )
+
+            Row(
+                modifier = Modifier
+                    .padding(WindowInsets.safeDrawing.asPaddingValues())
+                    .fillMaxWidth()
+                    .padding(start = 24.dp, end = 24.dp)
+                    .align(Alignment.TopCenter),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                PauseButton(onClick = { viewModel.togglePause() })
+                Spacer(modifier = Modifier.weight(1f))
+                ScoreBadge(score = state.score)
+            }
         }
 
         if (state.isIntroVisible) {
@@ -201,6 +202,10 @@ fun GameScreen(
                 )
             }
         }
+    }
+
+    BackHandler(enabled = !state.isPaused && !state.isGameOver) {
+        viewModel.pauseGame()
     }
 }
 
