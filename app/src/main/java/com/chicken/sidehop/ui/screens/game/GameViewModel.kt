@@ -109,9 +109,11 @@ class GameViewModel @Inject constructor(
         val current = _uiState.value
         if (current.isPaused || current.isGameOver || current.isIntroVisible) return
 
-        val difficulty = 1f + current.score * 0.05f
+        val difficulty = 1f + current.score * SpawnTimingConfig.SPAWN_GROWTH_PER_SCORE
         spawnTimer -= delta
-        val baseSpeed = 0.42f + (current.score * 0.02f)
+        val baseSpeed = (
+            FallingSpeedConfig.MIN_SPEED + (current.score * FallingSpeedConfig.SPEED_GROWTH_PER_SCORE)
+            ).coerceAtMost(FallingSpeedConfig.MAX_SPEED)
 
         var items = current.items.map { item ->
             item.copy(yProgress = item.yProgress + delta * item.speed)
@@ -169,7 +171,10 @@ class GameViewModel @Inject constructor(
                 newItems += createItem(type, baseSpeed)
             }
             items = items + newItems
-            spawnTimer = max(0.6f, 1.2f / difficulty)
+            spawnTimer = max(
+                SpawnTimingConfig.MIN_INTERVAL,
+                SpawnTimingConfig.MAX_INTERVAL / difficulty
+            )
         }
 
         var chickenX = current.chickenX
@@ -215,7 +220,8 @@ class GameViewModel @Inject constructor(
         }
         val jitter = (Random.nextFloat() - 0.5f) * 0.08f
         val spawnX = (baseLane + jitter).coerceIn(0.1f, 0.9f)
-        val speed = baseSpeed + Random.nextFloat() * 0.35f
+        val speed = (baseSpeed + Random.nextFloat() * FallingSpeedConfig.RANDOM_SPEED_JITTER)
+            .coerceAtMost(FallingSpeedConfig.MAX_SPEED)
         return FallingItem(xPosition = spawnX, type = type, speed = speed)
     }
 }
