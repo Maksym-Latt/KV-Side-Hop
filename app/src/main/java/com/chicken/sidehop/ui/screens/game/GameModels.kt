@@ -6,6 +6,12 @@ import java.util.UUID
 
 enum class Lane { LEFT, RIGHT }
 
+object LanePositions {
+    const val LEFT = 0.24f
+    const val RIGHT = 0.76f
+    const val CENTER = (LEFT + RIGHT) / 2f
+}
+
 enum class ItemType(@DrawableRes val icon: Int, val isGood: Boolean) {
     EGG(R.drawable.item_egg, true),
     APPLE(R.drawable.item_apple, true),
@@ -22,7 +28,7 @@ enum class ItemType(@DrawableRes val icon: Int, val isGood: Boolean) {
 
 data class FallingItem(
     val id: String = UUID.randomUUID().toString(),
-    val lane: Lane,
+    val xPosition: Float,
     val type: ItemType,
     val yProgress: Float = 0f,
     val speed: Float
@@ -32,10 +38,13 @@ data class GameUiState(
     val score: Int = 0,
     val isPaused: Boolean = false,
     val chickenLane: Lane = Lane.LEFT,
+    val chickenX: Float = LanePositions.LEFT,
+    val chickenTargetX: Float = LanePositions.LEFT,
     val chickenJumpOffset: Float = 0f,
     val isJumping: Boolean = false,
     val jumpVelocity: Float = 0f,
     val items: List<FallingItem> = emptyList(),
     val isGameOver: Boolean = false,
-    val showWrongPick: Boolean = false
+    val showWrongPick: Boolean = false,
+    val isIntroVisible: Boolean = true
 )

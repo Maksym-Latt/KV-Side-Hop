@@ -90,11 +90,10 @@ fun GameScreen(
         )
 
         BoxWithConstraints(modifier = Modifier.matchParentSize()) {
-            val laneOffset = maxWidth * 0.22f
             val groundHeight = maxHeight * 0.78f
 
             state.items.forEach { item ->
-                val x = if (item.lane == Lane.LEFT) laneOffset else maxWidth - laneOffset
+                val x = maxWidth * item.xPosition
                 val y = groundHeight * item.yProgress
                 Image(
                     painter = painterResource(id = item.type.icon),
@@ -106,17 +105,12 @@ fun GameScreen(
                 )
             }
 
-            val chickenX = if (state.chickenLane == Lane.LEFT) laneOffset else maxWidth - laneOffset
+            val chickenX = maxWidth * state.chickenX
             val density = LocalDensity.current
 
             val chickenY: Dp = with(density) {
-                // groundHeight — це Dp, переводимо в px
                 val baseY = groundHeight.toPx()
-
-                // jump offset — Float, множимо на dp → px
                 val jumpOffsetPx = state.chickenJumpOffset * 120.dp.toPx()
-
-                // Загальна позиція у px → назад у Dp
                 (baseY + jumpOffsetPx).toDp()
             }
 
@@ -142,8 +136,6 @@ fun GameScreen(
                 ScoreBadge(score = state.score)
             }
 
-            ControlHints(modifier = Modifier.align(Alignment.BottomCenter))
-
             Box(
                 modifier = Modifier
                     .matchParentSize()
@@ -158,6 +150,10 @@ fun GameScreen(
                         }
                     }
             )
+        }
+
+        if (state.isIntroVisible) {
+            IntroOverlay(onStart = viewModel::dismissIntro)
         }
 
         if (state.isPaused) {
@@ -222,47 +218,6 @@ private fun PauseButton(onClick: () -> Unit) {
 }
 
 @Composable
-private fun ControlHints(modifier: Modifier = Modifier) {
-    Row(
-        modifier = modifier
-            .padding(bottom = 24.dp)
-            .fillMaxSize(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Column(
-            modifier = Modifier.padding(start = 18.dp, bottom = 32.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            OutlinedText(
-                text = "JUMP",
-                color = Color.White,
-                outline = OutlineDark,
-            )
-            OutlinedText(
-                text = "⬆",
-                color = Color.White,
-                outline = OutlineDark,
-            )
-        }
-        Column(
-            modifier = Modifier.padding(end = 18.dp, bottom = 32.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            OutlinedText(
-                text = "SWAP",
-                color = Color.White,
-                outline = OutlineDark,
-            )
-            OutlinedText(
-                text = "⇄",
-                color = Color.White,
-                outline = OutlineDark,
-            )
-        }
-    }
-}
-
-@Composable
 private fun PauseOverlay(
     onResume: () -> Unit,
     onMenu: () -> Unit,
@@ -290,6 +245,58 @@ private fun PauseOverlay(
                 PrimaryButton(text = "RESUME", onClick = onResume, style = ButtonStyle.Yellow)
                 PrimaryButton(text = "SETTINGS", onClick = onSettings, style = ButtonStyle.Yellow)
                 PrimaryButton(text = "MENU", onClick = onMenu, style = ButtonStyle.Red)
+            }
+        }
+    }
+}
+
+@Composable
+private fun IntroOverlay(onStart: () -> Unit, modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.4f))
+            .pointerInput(Unit) {
+                detectTapGestures { onStart() }
+            }
+    ) {
+        PanelCard(
+            modifier = Modifier
+                .align(Alignment.Center)
+                .padding(horizontal = 20.dp)
+        ) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                OutlinedText(
+                    text = "ЯК ГРАТИ",
+                    color = MaterialTheme.colorScheme.secondary,
+                    outline = OutlineDark,
+                )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        OutlinedText(text = "Ліва половина", color = Color.White, outline = OutlineDark)
+                        OutlinedText(text = "Стрибок", color = Color.White, outline = OutlineDark)
+                    }
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        OutlinedText(text = "Права половина", color = Color.White, outline = OutlineDark)
+                        OutlinedText(text = "Ривок у бік", color = Color.White, outline = OutlineDark)
+                    }
+                }
+                OutlinedText(
+                    text = "Курка біжить між доріжками та ловить предмети навіть посередині.",
+                    color = Color.White,
+                    outline = OutlineDark,
+                )
+                OutlinedText(
+                    text = "Торкніться будь-де, щоб почати!",
+                    color = MaterialTheme.colorScheme.secondary,
+                    outline = OutlineDark,
+                )
             }
         }
     }
