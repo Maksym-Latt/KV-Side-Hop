@@ -2,10 +2,11 @@ package com.chicken.sidehop.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
-
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+val YellowPrimary = Color(0xFFFFE27A)
+val YellowDeep = Color(0xFFF9C712)
+val RedPrimary = Color(0xFFEA554C)
+val BrownBoard = Color(0xFF965A3D)
+val CreamPanel = Color(0xFFFFF1D8)
+val OutlineDark = Color(0xFF6B1D1D)
+val GrassGreen = Color(0xFF6CC04A)
+val SkyBlue = Color(0xFF8DD2FF)
