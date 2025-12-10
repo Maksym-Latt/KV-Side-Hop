@@ -3,6 +3,7 @@ package com.chicken.sidehop.ui.screens.game
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.chicken.sidehop.core.audio.AudioController
+import com.chicken.sidehop.data.settings.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,14 +19,15 @@ import kotlin.random.Random
 
 @HiltViewModel
 class GameViewModel @Inject constructor(
-    private val audioController: AudioController
+    private val audioController: AudioController,
+    private val settingsRepository: SettingsRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(GameUiState())
     val uiState: StateFlow<GameUiState> = _uiState.asStateFlow()
 
     private var spawnTimer = 0f
-    private val gravity = 4f
+    private val gravity = 3.4f
 
     init {
         audioController.playGameMusic()
@@ -33,21 +35,35 @@ class GameViewModel @Inject constructor(
     }
 
     fun togglePause() {
+        audioController.playTap()
         _uiState.update { it.copy(isPaused = !it.isPaused) }
     }
 
     fun pauseGame() {
+        audioController.playTap()
         _uiState.update { it.copy(isPaused = true) }
     }
 
     fun resumeGame() {
+        audioController.playTap()
         _uiState.update { it.copy(isPaused = false) }
+    }
+
+    fun onExitToMenu() {
+        audioController.playTap()
+        viewModelScope.launch {
+            settingsRepository.updateBestScoreIfHigher(_uiState.value.score)
+        }
+        audioController.playMenuMusic()
     }
 
     fun onJump() {
         _uiState.update { state ->
             if (state.isPaused || state.isGameOver || state.isJumping || state.isIntroVisible) state
-            else state.copy(isJumping = true, jumpVelocity = -2.3f)
+            else {
+                audioController.playTap()
+                state.copy(isJumping = true, jumpVelocity = -2.3f)
+            }
         }
     }
 
@@ -55,6 +71,7 @@ class GameViewModel @Inject constructor(
         _uiState.update { state ->
             if (state.isPaused || state.isGameOver || state.isIntroVisible) state
             else {
+                audioController.playTap()
                 val newLane = if (state.chickenLane == Lane.LEFT) Lane.RIGHT else Lane.LEFT
                 val targetX = if (newLane == Lane.LEFT) LanePositions.LEFT else LanePositions.RIGHT
                 state.copy(chickenLane = newLane, chickenTargetX = targetX)
@@ -63,7 +80,10 @@ class GameViewModel @Inject constructor(
     }
 
     fun dismissIntro() {
-        _uiState.update { it.copy(isIntroVisible = false) }
+        _uiState.update {
+            audioController.playTap()
+            it.copy(isIntroVisible = false)
+        }
     }
 
     fun restart() {
@@ -91,15 +111,15 @@ class GameViewModel @Inject constructor(
 
         val difficulty = 1f + current.score * 0.05f
         spawnTimer -= delta
-        val baseSpeed = 0.55f + (current.score * 0.03f)
+        val baseSpeed = 0.42f + (current.score * 0.02f)
 
         var items = current.items.map { item ->
             item.copy(yProgress = item.yProgress + delta * item.speed)
         }.filter { it.yProgress < 1.2f }
 
-        val contactThreshold = 0.8f
-        val groundRange = 0.12f
-        val catchWidth = 0.12f
+        val contactThreshold = CollisionConfig.CONTACT_THRESHOLD
+        val groundRange = CollisionConfig.GROUND_RANGE
+        val catchWidth = CollisionConfig.CATCH_WIDTH
 
         val collected = items.filter { item ->
             abs(item.xPosition - current.chickenX) <= catchWidth &&
@@ -118,6 +138,9 @@ class GameViewModel @Inject constructor(
                         showWrongPick = true,
                         items = emptyList()
                     )
+                }
+                viewModelScope.launch {
+                    settingsRepository.updateBestScoreIfHigher(current.score)
                 }
                 return
             } else {
@@ -189,7 +212,7 @@ class GameViewModel @Inject constructor(
         }
         val jitter = (Random.nextFloat() - 0.5f) * 0.08f
         val spawnX = (baseLane + jitter).coerceIn(0.1f, 0.9f)
-        val speed = baseSpeed + Random.nextFloat() * 0.5f
+        val speed = baseSpeed + Random.nextFloat() * 0.35f
         return FallingItem(xPosition = spawnX, type = type, speed = speed)
     }
 }

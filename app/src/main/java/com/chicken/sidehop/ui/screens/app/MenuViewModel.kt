@@ -28,4 +28,8 @@ class MenuViewModel @Inject constructor(
     fun toggleSound(enabled: Boolean) {
         audioController.setSoundEnabled(enabled)
     }
+
+    fun onButtonTap() {
+        audioController.playTap()
+    }
 }

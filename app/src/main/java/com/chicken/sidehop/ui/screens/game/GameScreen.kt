@@ -2,7 +2,7 @@ package com.chicken.sidehop.ui.screens.game
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,12 +14,10 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -27,9 +25,6 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,16 +38,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.chicken.sidehop.R
-import com.chicken.sidehop.ui.components.ButtonStyle
 import com.chicken.sidehop.ui.components.OutlinedText
-import com.chicken.sidehop.ui.components.PanelCard
-import com.chicken.sidehop.ui.components.PrimaryButton
 import com.chicken.sidehop.ui.components.RoundButton
 import com.chicken.sidehop.ui.components.ScoreBadge
-import com.chicken.sidehop.ui.components.ToggleSwitch
-import com.chicken.sidehop.ui.screens.app.SettingsViewModel
 import com.chicken.sidehop.ui.theme.OutlineDark
 import kotlinx.coroutines.delay
 
@@ -62,6 +51,7 @@ fun GameScreen(
     onExit: () -> Unit,
     onGameOver: (score: Int) -> Unit
 ) {
+    val debugging = true
     val state by viewModel.uiState.collectAsState()
 
     LaunchedEffect(state.isGameOver) {
@@ -93,38 +83,62 @@ fun GameScreen(
         )
 
         BoxWithConstraints(modifier = Modifier.matchParentSize()) {
-            val groundHeight = maxHeight * 0.78f
+            val itemFallHeight = maxHeight * 0.78f
+            val chickenSize = 140.dp
 
             state.items.forEach { item ->
                 val x = maxWidth * item.xPosition
-                val y = groundHeight * item.yProgress
-                Image(
-                    painter = painterResource(id = item.type.icon),
-                    contentDescription = null,
+                val y = itemFallHeight * item.yProgress
+                Box(
                     modifier = Modifier
                         .size(64.dp)
-                        .offset(x = x - 32.dp, y = y - 32.dp),
-                    contentScale = ContentScale.Fit
-                )
+                        .offset(x = x - 32.dp, y = y - 32.dp)
+                ) {
+                    if (debugging) {
+                        Box(
+                            modifier = Modifier
+                                .matchParentSize()
+                                .border(2.dp, Color.Red, CircleShape)
+                        )
+                    }
+                    Image(
+                        painter = painterResource(id = item.type.icon),
+                        contentDescription = null,
+                        modifier = Modifier.matchParentSize(),
+                        contentScale = ContentScale.Fit
+                    )
+                }
             }
 
             val chickenX = maxWidth * state.chickenX
             val density = LocalDensity.current
 
             val chickenY: Dp = with(density) {
-                val baseY = groundHeight.toPx()
+                val baseY = (maxHeight / 2 + chickenSize).toPx()
                 val jumpOffsetPx = state.chickenJumpOffset * 120.dp.toPx()
-                (baseY + jumpOffsetPx).toDp()
+                (baseY + jumpOffsetPx - chickenSize.toPx()).toDp()
             }
 
             Image(
                 painter = painterResource(id = R.drawable.chicken),
                 contentDescription = null,
                 modifier = Modifier
-                    .size(140.dp)
-                    .offset(x = chickenX - 70.dp, y = chickenY - 80.dp),
+                    .size(chickenSize)
+                    .offset(x = chickenX - 70.dp, y = chickenY),
                 contentScale = ContentScale.Fit
             )
+
+            if (debugging) {
+                val catchAreaWidth = maxWidth * (CollisionConfig.CATCH_WIDTH * 2f)
+                val catchAreaHeight = itemFallHeight * CollisionConfig.GROUND_RANGE
+                val catchY = itemFallHeight * CollisionConfig.CONTACT_THRESHOLD
+                Box(
+                    modifier = Modifier
+                        .size(width = catchAreaWidth, height = catchAreaHeight)
+                        .offset(x = chickenX - (catchAreaWidth / 2), y = catchY)
+                        .border(2.dp, Color.Green)
+                )
+            }
 
             Row(
                 modifier = Modifier
@@ -163,7 +177,10 @@ fun GameScreen(
         if (state.isPaused) {
             PauseOverlay(
                 onResume = { viewModel.resumeGame() },
-                onMenu = onExit,
+                onMenu = {
+                    viewModel.onExitToMenu()
+                    onExit()
+                },
             )
         }
 

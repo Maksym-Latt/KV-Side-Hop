@@ -12,6 +12,12 @@ object LanePositions {
     const val CENTER = (LEFT + RIGHT) / 2f
 }
 
+object CollisionConfig {
+    const val CONTACT_THRESHOLD = 0.8f
+    const val GROUND_RANGE = 0.12f
+    const val CATCH_WIDTH = 0.12f
+}
+
 enum class ItemType(@DrawableRes val icon: Int, val isGood: Boolean) {
     EGG(R.drawable.item_egg, true),
     APPLE(R.drawable.item_apple, true),

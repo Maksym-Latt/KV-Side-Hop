@@ -17,11 +17,15 @@ class SettingsViewModel @Inject constructor(
     val isMusicEnabled: StateFlow<Boolean> = audioController.isMusicEnabled
 
     fun onSoundToggle(enabled: Boolean) {
-        viewModelScope.launch { audioController.setSoundEnabled(enabled) }
+        viewModelScope.launch {
+            audioController.playTap()
+            audioController.setSoundEnabled(enabled)
+        }
     }
 
     fun onMusicToggle(enabled: Boolean) {
         viewModelScope.launch {
+            audioController.playTap()
             audioController.setMusicEnabled(enabled)
             if (enabled) audioController.playMenuMusic()
         }

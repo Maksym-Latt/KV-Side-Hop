@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -19,6 +21,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.chicken.sidehop.R
 import com.chicken.sidehop.ui.components.ButtonStyle
 import com.chicken.sidehop.ui.components.OutlinedText
@@ -31,8 +34,15 @@ import com.chicken.sidehop.ui.theme.YellowDeep
 fun ResultScreen(
     score: Int,
     onRetry: () -> Unit,
-    onMenu: () -> Unit
+    onMenu: () -> Unit,
+    viewModel: ResultViewModel = hiltViewModel()
 ) {
+    val bestScore = viewModel.bestScore.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.ensureBestScore(score)
+        viewModel.onScreenVisible()
+    }
 
     Box(
         modifier = Modifier
@@ -70,6 +80,13 @@ fun ResultScreen(
                 fontSize = 30.sp
             )
 
+            OutlinedText(
+                text = "MAX: ${bestScore.value}",
+                color = Color(0xfffdfdfd),
+                outline = Color(0xffa17246),
+                fontSize = 28.sp
+            )
+
             Spacer(modifier = Modifier.weight(0.4f))
 
             Image(
@@ -84,7 +101,10 @@ fun ResultScreen(
 
             PrimaryButton(
                 text = "TRY AGAIN",
-                onClick = onRetry,
+                onClick = {
+                    viewModel.onButtonTap()
+                    onRetry()
+                },
                 style = ButtonStyle.Yellow,
                 height = 84.dp,
                 modifier = Modifier.fillMaxWidth()
@@ -94,7 +114,10 @@ fun ResultScreen(
 
             PrimaryButton(
                 text = "MENU",
-                onClick = onMenu,
+                onClick = {
+                    viewModel.onButtonTap()
+                    onMenu()
+                },
                 style = ButtonStyle.Red,
                 height = 84.dp,
                 modifier = Modifier.fillMaxWidth()
