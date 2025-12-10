@@ -33,8 +33,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -46,6 +48,7 @@ import com.chicken.sidehop.ui.components.PanelCard
 import com.chicken.sidehop.ui.components.PrimaryButton
 import com.chicken.sidehop.ui.components.ScoreBadge
 import com.chicken.sidehop.ui.components.ToggleSwitch
+import com.chicken.sidehop.ui.screens.app.SettingsViewModel
 import com.chicken.sidehop.ui.theme.OutlineDark
 import kotlinx.coroutines.delay
 
@@ -104,7 +107,19 @@ fun GameScreen(
             }
 
             val chickenX = if (state.chickenLane == Lane.LEFT) laneOffset else maxWidth - laneOffset
-            val chickenY = groundHeight + (state.chickenJumpOffset * 120.dp)
+            val density = LocalDensity.current
+
+            val chickenY: Dp = with(density) {
+                // groundHeight — це Dp, переводимо в px
+                val baseY = groundHeight.toPx()
+
+                // jump offset — Float, множимо на dp → px
+                val jumpOffsetPx = state.chickenJumpOffset * 120.dp.toPx()
+
+                // Загальна позиція у px → назад у Dp
+                (baseY + jumpOffsetPx).toDp()
+            }
+
             Image(
                 painter = painterResource(id = R.drawable.chicken),
                 contentDescription = null,
@@ -170,7 +185,6 @@ fun GameScreen(
                     text = "Wrong pick!",
                     color = Color.White,
                     outline = OutlineDark,
-                    style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.padding(top = 140.dp)
                 )
             }
@@ -223,13 +237,11 @@ private fun ControlHints(modifier: Modifier = Modifier) {
                 text = "JUMP",
                 color = Color.White,
                 outline = OutlineDark,
-                style = MaterialTheme.typography.bodyLarge
             )
             OutlinedText(
                 text = "⬆",
                 color = Color.White,
                 outline = OutlineDark,
-                style = MaterialTheme.typography.titleLarge
             )
         }
         Column(
@@ -240,13 +252,11 @@ private fun ControlHints(modifier: Modifier = Modifier) {
                 text = "SWAP",
                 color = Color.White,
                 outline = OutlineDark,
-                style = MaterialTheme.typography.bodyLarge
             )
             OutlinedText(
                 text = "⇄",
                 color = Color.White,
                 outline = OutlineDark,
-                style = MaterialTheme.typography.titleLarge
             )
         }
     }
@@ -276,7 +286,6 @@ private fun PauseOverlay(
                     text = "PAUSE",
                     color = MaterialTheme.colorScheme.secondary,
                     outline = OutlineDark,
-                    style = MaterialTheme.typography.titleLarge
                 )
                 PrimaryButton(text = "RESUME", onClick = onResume, style = ButtonStyle.Yellow)
                 PrimaryButton(text = "SETTINGS", onClick = onSettings, style = ButtonStyle.Yellow)
@@ -313,10 +322,9 @@ private fun SettingsOverlay(
                     text = "SETTINGS",
                     color = MaterialTheme.colorScheme.secondary,
                     outline = OutlineDark,
-                    style = MaterialTheme.typography.titleLarge
                 )
-                ToggleSwitch(label = "SOUND", enabled = soundEnabled.value, onToggle = viewModel::onSoundToggle)
-                ToggleSwitch(label = "MUSIC", enabled = musicEnabled.value, onToggle = viewModel::onMusicToggle)
+                ToggleSwitch(enabled = soundEnabled.value, onToggle = viewModel::onSoundToggle)
+                ToggleSwitch(enabled = musicEnabled.value, onToggle = viewModel::onMusicToggle)
                 PrimaryButton(text = "CLOSE", onClick = onClose, style = ButtonStyle.Yellow)
                 PrimaryButton(text = "MENU", onClick = onMenu, style = ButtonStyle.Red)
             }

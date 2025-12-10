@@ -52,7 +52,6 @@ fun ResultScreen(
                 text = "WRONG PICK!",
                 color = MaterialTheme.colorScheme.secondary,
                 outline = OutlineDark,
-                style = MaterialTheme.typography.titleLarge
             )
             Image(
                 painter = painterResource(id = R.drawable.chicken_lose),
@@ -66,7 +65,6 @@ fun ResultScreen(
                         text = "SCORE: $score",
                         color = YellowDeep,
                         outline = OutlineDark,
-                        style = MaterialTheme.typography.titleLarge
                     )
                 }
             }

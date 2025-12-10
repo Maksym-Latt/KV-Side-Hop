@@ -36,7 +36,6 @@ fun ScoreBadge(score: Int, modifier: Modifier = Modifier) {
             text = score.toString(),
             color = YellowDeep,
             outline = OutlineDark,
-            style = MaterialTheme.typography.titleLarge
         )
     }
 }
