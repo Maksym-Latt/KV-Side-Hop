@@ -35,18 +35,33 @@ class GameViewModel @Inject constructor(
     }
 
     fun togglePause() {
-        audioController.playTap()
-        _uiState.update { it.copy(isPaused = !it.isPaused) }
+        _uiState.update { state ->
+            if (state.isGameOver) state
+            else {
+                audioController.playTap()
+                state.copy(isPaused = !state.isPaused)
+            }
+        }
     }
 
     fun pauseGame() {
-        audioController.playTap()
-        _uiState.update { it.copy(isPaused = true) }
+        _uiState.update { state ->
+            if (state.isGameOver) state
+            else {
+                audioController.playTap()
+                state.copy(isPaused = true)
+            }
+        }
     }
 
     fun resumeGame() {
-        audioController.playTap()
-        _uiState.update { it.copy(isPaused = false) }
+        _uiState.update { state ->
+            if (state.isGameOver) state
+            else {
+                audioController.playTap()
+                state.copy(isPaused = false)
+            }
+        }
     }
 
     fun onExitToMenu() {

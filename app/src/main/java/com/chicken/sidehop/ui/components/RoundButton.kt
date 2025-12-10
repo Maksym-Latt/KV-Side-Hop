@@ -30,13 +30,14 @@ fun RoundButton(
     icon: Int,
     modifier: Modifier = Modifier,
     size: Dp = 84.dp,
+    enabled: Boolean = true,
     onClick: () -> Unit
 ) {
     Box(
         modifier = modifier
             .size(size)
             .clip(RoundedCornerShape(size / 2))
-            .clickable(onClick = onClick)
+            .clickable(enabled = enabled, onClick = onClick)
     ) {
         val frameSize = size * 1.12f
         val innerSize = size * 0.92f

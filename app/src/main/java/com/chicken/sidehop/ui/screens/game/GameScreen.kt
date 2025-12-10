@@ -57,7 +57,7 @@ fun GameScreen(
 
     LaunchedEffect(state.isGameOver) {
         if (state.isGameOver) {
-            delay(400)
+            delay(1000)
             onGameOver(state.score)
         }
     }
@@ -168,7 +168,10 @@ fun GameScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                PauseButton(onClick = { viewModel.togglePause() })
+                PauseButton(
+                    onClick = { viewModel.togglePause() },
+                    enabled = !state.isGameOver
+                )
                 Spacer(modifier = Modifier.weight(1f))
                 ScoreBadge(score = state.score)
             }
@@ -210,7 +213,7 @@ fun GameScreen(
 }
 
 @Composable
-private fun PauseButton(onClick: () -> Unit) {
+private fun PauseButton(onClick: () -> Unit, enabled: Boolean) {
     Box(
         modifier = Modifier
             .fillMaxWidth(),
@@ -219,7 +222,8 @@ private fun PauseButton(onClick: () -> Unit) {
         RoundButton(
             icon = R.drawable.ic_settings,
             size = 64.dp,
-            onClick = onClick
+            onClick = onClick,
+            enabled = enabled
         )
     }
 }
