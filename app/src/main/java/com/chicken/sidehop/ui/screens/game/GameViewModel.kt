@@ -117,13 +117,16 @@ class GameViewModel @Inject constructor(
             item.copy(yProgress = item.yProgress + delta * item.speed)
         }.filter { it.yProgress < 1.2f }
 
-        val contactThreshold = CollisionConfig.CONTACT_THRESHOLD
+        val baseContact = CollisionConfig.CONTACT_THRESHOLD
+        val verticalContact = (baseContact + current.chickenJumpOffset * CollisionConfig.JUMP_INFLUENCE)
+            .coerceIn(0f, 1f)
+        val contactThreshold = verticalContact
         val groundRange = CollisionConfig.GROUND_RANGE
         val catchWidth = CollisionConfig.CATCH_WIDTH
 
         val collected = items.filter { item ->
             abs(item.xPosition - current.chickenX) <= catchWidth &&
-                item.yProgress in contactThreshold..(contactThreshold + groundRange)
+                item.yProgress in contactThreshold..(contactThreshold + groundRange).coerceAtMost(1f)
         }
 
         if (collected.isNotEmpty()) {

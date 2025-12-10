@@ -16,6 +16,7 @@ object CollisionConfig {
     const val CONTACT_THRESHOLD = 0.8f
     const val GROUND_RANGE = 0.12f
     const val CATCH_WIDTH = 0.12f
+    const val JUMP_INFLUENCE = 0.2f
 }
 
 enum class ItemType(@DrawableRes val icon: Int, val isGood: Boolean) {

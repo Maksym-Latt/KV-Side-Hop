@@ -129,9 +129,12 @@ fun GameScreen(
             )
 
             if (debugging) {
+                val verticalContact = (CollisionConfig.CONTACT_THRESHOLD +
+                    state.chickenJumpOffset * CollisionConfig.JUMP_INFLUENCE)
+                    .coerceIn(0f, 1f)
                 val catchAreaWidth = maxWidth * (CollisionConfig.CATCH_WIDTH * 2f)
                 val catchAreaHeight = itemFallHeight * CollisionConfig.GROUND_RANGE
-                val catchY = itemFallHeight * CollisionConfig.CONTACT_THRESHOLD
+                val catchY = itemFallHeight * verticalContact
                 Box(
                     modifier = Modifier
                         .size(width = catchAreaWidth, height = catchAreaHeight)
