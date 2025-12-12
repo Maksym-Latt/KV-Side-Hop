@@ -50,12 +50,12 @@ fun IntroOverlay(onStart: () -> Unit, modifier: Modifier = Modifier) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        OutlinedText(text = "Left side", color = Color.White, outline = OutlineDark)
                         OutlinedText(text = "Jump", color = Color.White, outline = OutlineDark)
+                        OutlinedText(text = "Tap the Jump button to hop upward.", color = Color.White, outline = OutlineDark)
                     }
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        OutlinedText(text = "Right side", color = Color.White, outline = OutlineDark)
-                        OutlinedText(text = "Dash sideways", color = Color.White, outline = OutlineDark)
+                        OutlinedText(text = "Slide", color = Color.White, outline = OutlineDark)
+                        OutlinedText(text = "Use the Slide button to switch lanes fast.", color = Color.White, outline = OutlineDark)
                     }
                 }
                 OutlinedText(
