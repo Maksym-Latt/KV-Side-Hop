@@ -3,7 +3,6 @@ package com.chicken.sidehop.ui.screens.game
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -29,7 +28,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -144,21 +142,6 @@ fun GameScreen(
                 )
             }
 
-            Box(
-                modifier = Modifier
-                    .matchParentSize()
-                    .pointerInput(Unit) {
-                        detectTapGestures { offset ->
-                            val center = size.width / 2
-                            if (offset.x < center) {
-                                viewModel.onJump()
-                            } else {
-                                viewModel.onSwitchLane()
-                            }
-                        }
-                    }
-            )
-
             Row(
                 modifier = Modifier
                     .padding(WindowInsets.safeDrawing.asPaddingValues())
@@ -175,6 +158,27 @@ fun GameScreen(
                 Spacer(modifier = Modifier.weight(1f))
                 ScoreBadge(score = state.score)
             }
+        }
+
+        Row(
+            modifier = Modifier
+                .padding(WindowInsets.safeDrawing.asPaddingValues())
+                .fillMaxWidth()
+                .padding(horizontal = 40.dp, vertical = 32.dp)
+                .align(Alignment.BottomCenter),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            RoundButton(
+                icon = R.drawable.ic_arrow_up,
+                onClick = viewModel::onJump,
+                enabled = !state.isPaused && !state.isGameOver && !state.isIntroVisible
+            )
+            RoundButton(
+                icon = R.drawable.ic_arrow_side,
+                onClick = viewModel::onSwitchLane,
+                enabled = !state.isPaused && !state.isGameOver && !state.isIntroVisible
+            )
         }
 
         if (state.isIntroVisible) {
