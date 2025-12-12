@@ -57,7 +57,7 @@ fun GameScreen(
 
     LaunchedEffect(state.isGameOver) {
         if (state.isGameOver) {
-            delay(1000)
+            delay(2000)
             onGameOver(state.score)
         }
     }
@@ -115,13 +115,13 @@ fun GameScreen(
             val density = LocalDensity.current
 
             val chickenY: Dp = with(density) {
-                val baseY = (maxHeight / 2 + chickenSize).toPx()
+                val baseY = ((maxHeight / 2) + chickenSize / 2).toPx()
                 val jumpOffsetPx = state.chickenJumpOffset * 120.dp.toPx()
                 (baseY + jumpOffsetPx - chickenSize.toPx()).toDp()
             }
 
             Image(
-                painter = painterResource(id = R.drawable.chicken),
+                painter = painterResource(id = R.drawable.chicken_play),
                 contentDescription = null,
                 modifier = Modifier
                     .size(chickenSize)
